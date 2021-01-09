@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+:root{
+    --body-backgroung-color: hsl(0, 0%, 97%);
+    --body-backgroung-color-dark: hsl(235, 21%, 11%);
+
+    --tasks-background-dark: hsl(235, 24%, 19%);
+
+    --text-color-light: hsl(235, 19%, 35%);
+    --text-color-dark: hsl(233, 11%, 84%);
+
+
+    --desktop-screen-width: 1200px;
+    --mobile-screen-width: 375px;
+
+    --tasks-height: 362px;
+
+    --checkbox-size: 18px;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Josefin Sans";
+}
+
+
+.container{
+    position: relative;
+    background-color: var(--body-backgroung-color);
+    width: 100vw;
+    min-height: 100vh;
+}
+body.dark-mode .container{
+    background-color: var(--body-backgroung-color-dark);
+}
+
+.container .background{
+    width: 100%;
+    height: 230px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+.container .background{
+    background-image: url("../images/bg-desktop-light.jpg");
+
+}
+body.dark-mode .container .background{
+    background-image: url("../images/bg-desktop-dark.jpg");
+}
+
+.container .todolist{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 55px;
+}
+
+.container .todolist>div{
+    width: 500px !important;
+}
+
+.container .todolist h1{
+    color: #FFF;
+    letter-spacing: 12px;
+    margin:0 0 25px 0;
+}
+
+.container .todolist h1 img{
+    float: right;
+    cursor: pointer;
+}
+
+.container .todolist form input{
+    outline: none;
+    display: block;
+    padding: 15px;
+    margin: 20px 0;
+    width: 100%;
+    height: 50px;
+    border: 1px solid #fafafa;
+    border-radius: 3px;
+    color: var(--text-color-light);
+}
+.container .todolist form input::placeholder{
+    color: var(--text-color-light);
+}
+body.dark-mode .container .todolist form input{
+    border: 1px solid var(--tasks-background-dark);
+    background-color: var(--tasks-background-dark);
+    color: var(--text-color-dark);
+}
+body.dark-mode .container .todolist form input::placeholder{
+    color: var(--text-color-dark);
+}
+
+.container .todolist #displayTasks{
+    position: relative;
+    height: var(--tasks-height);
+    background: #FFF;
+    border: 1px solid #fafafa;
+    border-radius: 3px;
+    color: var(--text-color-light);
+    box-shadow: 0px 5px 10px 0px #d6d6d698;
+}
+body.dark-mode .container .todolist #displayTasks{
+    background-color: var(--tasks-background-dark);
+    border: 1px solid var(--tasks-background-dark);
+    color: var(--text-color-dark);
+    box-shadow: 0px 5px 10px 0px #161722;
+
+}
+
+.container .todolist #displayTasks #tasks{
+    height: calc(0.865 * var(--tasks-height));
+    font-size: 15px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.container .todolist #displayTasks #tasks::-webkit-scrollbar{
+    display: none;
+}
+
+
+.container .todolist #displayTasks #tasks .task{
+    position: relative;
+    font-size: 15x;
+    color: var(--text-color-light);
+    padding: 15px 10%;
+    line-height: 1.4;
+    cursor: pointer;
+    outline: none;
+    
+}
+body.dark-mode .container .todolist #displayTasks #tasks .task{
+    color: var(--text-color-dark);
+}
+
+.container .todolist #displayTasks #tasks .task:not(:last-of-type){
+    border-bottom: 1px solid rgba(218, 218, 218, 0.63);
+}
+body.dark-mode .container .todolist #displayTasks #tasks .task:not(:last-of-type){
+    border-bottom: 1px solid rgba(99, 99, 99, 0.63);
+}
+
+.container .todolist #displayTasks #tasks .task .checkbox{
+    position:absolute;
+    overflow: hidden;
+    top: 50%;
+    left: 4%;
+    transform: translate(-4%, -50%);
+    padding: 1px;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    background: hsl(236, 9%, 61%);
+    border-radius: 50%;
+    cursor: pointer;
+}
+.container .todolist #displayTasks #tasks .task:hover .checkbox,
+.container .todolist #displayTasks #tasks .task[data-is-completed="true"] .checkbox{
+    background: linear-gradient(130deg, hsl(192, 100%, 67%),  hsl(280, 87%, 65%));
+}
+.container .todolist #displayTasks #tasks .task .checkbox span{
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #FFF
+}
+body.dark-mode .container .todolist #displayTasks #tasks .task .checkbox span{
+    background-color: var(--tasks-background-dark);
+}
+
+.container .todolist #displayTasks #tasks .task .checkbox span img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.container .todolist #displayTasks #tasks .task[data-is-completed="false"] .checkbox span img{
+    visibility: hidden;
+}
+
+.container .todolist #displayTasks #tasks .task[data-is-completed="true"] .checkbox span{
+    background: linear-gradient(130deg, hsl(192, 100%, 67%),  hsl(280, 87%, 65%));
+}
+
+.container .todolist #displayTasks #tasks .task[data-is-completed="true"] .taskContent{
+    text-decoration: line-through;
+    opacity: .3;
+}
+
+.container .todolist #displayTasks #tasks .task .removeBtn{
+    position:absolute;
+    top: 50%;
+    right: 4%;
+    transform: translate(4%, -50%);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    visibility: hidden;
+}
+.container .todolist #displayTasks #tasks .task:hover .removeBtn{
+    visibility: visible;
+}
+
+.container .todolist #displayTasks #controls{
+    height: calc(0.135 * var(--tasks-height));
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px 0;
+    border-top: 1px solid rgba(218, 218, 218, 0.63);
+    color: var(--text-color-light);
+    font-size: 12px;
+    font-weight: bold;
+    background-color: #fff;
+}
+
+body.dark-mode .container .todolist #displayTasks #controls{
+    border-top: 1px solid rgba(99, 99, 99, 0.63);
+    background-color: var(--tasks-background-dark);
+    color: var(--text-color-dark);
+}
+
+.container .todolist #displayTasks #controls span{
+    opacity: .5;
+    cursor: pointer;
+}
+
+.container .todolist #displayTasks #controls div:nth-of-type(2) span{
+    margin: 0 5px;
+}
+.container .todolist #displayTasks #controls span:hover{
+    opacity: 1 !important;
+}
+.container .todolist #displayTasks #controls div:nth-of-type(2) span:active,
+.container .todolist #displayTasks #controls div:nth-of-type(2) span.active{
+    opacity: 1 !important;
+    color: hsl(220, 98%, 61%);
+}
+
+.container .todolist #displayTasks #controls div:not(:nth-of-type(2)) span:hover{
+    color: hsl(2, 98%, 61%);
+}
+.container .todolist #displayTasks #controls div:not(:nth-of-type(2)) span.disabled{
+    pointer-events: none;
+}
+
+.container footer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: var(--text-color-light);
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    font-size: 10px;
+    opacity: .5;
+}
+body.dark-mode .container  footer{
+    color: var(--text-color-dark);
+}
+
+.container footer:hover{
+    opacity: 1;
+}

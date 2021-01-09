@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+    <link rel="stylesheet" href="./style/style.css">
+    
+    <title>Todo app</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="background"></div>
+
+      <div class="todolist">
+        <div>
+          <h1>TODO <img id="modesSwitch" data-mode="light" src="./images/icon-moon.svg"></h1>
+
+          <form>
+            <input autofocus autocomplete="off" id="typeInput" type="text"  placeholder="Type a new task ...">
+          </form>
+
+          <div id="displayTasks">
+            <div id="tasks">
+              
+            </div>
+
+            <div id="controls">
+              <div>
+                <span id="clearAllBtn" class="disabled">Clear All</span>
+              </div>
+
+              <div id="displayWays">
+                <span id="displayAll" class="active">All</span>
+                <span id="displayActive">Active</span>
+                <span id="displayCompleted">Completed</span>
+              </div>
+
+              <div>
+                <span id="clearCompletedTasks" class="disabled">Clear Completed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>designed by fady emad ' the dragon '</footer>
+    </div>
+
+    <script src="./js/jsc.js"></script>
+  </body>
+</html>
