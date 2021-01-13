@@ -32,16 +32,26 @@ let modesSwitch = document.getElementById("modesSwitch"),                   // g
     --------------------------------------------------------------
 */  
     if(storedTasks!=null){
-        tasksObject = JSON.parse(storedTasks);
-        allTasks = tasksObject["allTasks"];
+        try{
+            tasksObject = JSON.parse(storedTasks);
+            if(typeof tasksObject != "object")
+                throw "error";
 
-        systemMode = tasksObject["systemMode"];
+            allTasks = tasksObject["allTasks"];
+            systemMode = tasksObject["systemMode"];
+        }catch(error){
+            localStorage.removeItem("newtodolist3092001");
+            allTasks = [];
+            systemMode = "light";
+        }
+
+        
         if(systemMode=="light"){
             lightMode();
         }else{
             darkMode();
         }
-        
+
         displayTasks(tasksContainer, allTasks, true);
         tasksCount = allTasks.length;
     }
@@ -126,14 +136,15 @@ let modesSwitch = document.getElementById("modesSwitch"),                   // g
     })
 
     clearCompletedBtn.onclick = function(){
-        deleteCompleted(allTasks, tasksObject);
+        deleteCompleted(allTasks);
 
-        resetTasksArray(allTasks, 0);
+        if(allTasks.length>0)
+            resetTasksArray(allTasks, 0);
         
         displayTasks(tasksContainer, allTasks, true);
 
-        tasksCount["allTasks"] = allTasks;
-        saveToLocalStorage(tasksCount);
+        tasksObject["allTasks"] = allTasks;
+        saveToLocalStorage(tasksObject);
         backToAllTasksMenu();
     }
 
@@ -156,15 +167,17 @@ function darkMode(){
 
 function createTask(tasksCount, taskContent){
     return  `<div class="task" data-is-completed="false" data-index = "${tasksCount}" tabindex="${tasksCount}">
+                <div class="toDropBefore"></div>
                 <span class="checkbox">
                     <span>
                         <img src="./images/icon-check.svg" alt="">
                     </span>
                 </span>
-                <span class="taskContent">${taskContent}</span> 
+                <span class="taskContent" draggable="true">${taskContent}</span> 
                 <span class="removeBtn">
                     <img src="./images/icon-cross.svg" alt="">
                 </span>
+                <div class="toDropAfter"></div>
             </div>`;
 }
 
@@ -174,13 +187,13 @@ function addTaskToArray(array, task){
 }
 
 function displayTasks(parent, array, callChangingFunction){
-    let tasks="";
     parent.innerHTML = "";
     array.forEach(element => {
-        tasks += element;
+        parent.innerHTML += element;
     });
-    parent.innerHTML = tasks;
 
+    toMakeTasksDraggableAndDroppable(parent);
+    
     if(callChangingFunction === true){
         toMakeTasksCheckable();
         toMakeTasksDeletable();
@@ -357,4 +370,102 @@ function toMakeTasksCheckable(){
             backToAllTasksMenu();
         }
     })
+}
+
+function toMakeTasksDraggableAndDroppable(parent){
+    parent.querySelectorAll(".task").forEach(parentEle => {
+        parentEle.setAttribute("draggable", "true");
+
+        let start, end;
+        parentEle.ondragstart = function(e){
+            e.dataTransfer.setData("start", e.target.getAttribute("data-index"));
+            e.dataTransfer.effectAllowed = "move";
+        }
+
+        parentEle.querySelectorAll(".toDropBefore").forEach(childEle => {
+            childEle.ondragover = function(e){
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+                
+                if( !(end == parseInt(parentEle.getAttribute("data-index"))) ){
+                    end = parseInt(parentEle.getAttribute("data-index"));
+                }
+            }
+
+            childEle.ondrop = function(e){
+                e.preventDefault();
+                start = parseInt(e.dataTransfer.getData("start"));
+                
+                if(start != end){
+                    moveBefore(allTasks, start, end);
+                    
+                    resetTasksArray(allTasks, 0);
+                    displayTasks(tasksContainer, allTasks, true);
+
+                    tasksObject["allTasks"] = allTasks;
+                    saveToLocalStorage(tasksObject);
+                    backToAllTasksMenu();
+                }
+            }
+
+            childEle.ondragenter = function(e){
+                this.classList.add("over");
+            }
+
+            childEle.ondragleave = function(e){
+                this.classList.remove("over");
+            }
+        })
+
+        parentEle.querySelectorAll(".toDropAfter").forEach(childEle => {
+            childEle.ondragover = function(e){
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+
+                if( !(end == parseInt(parentEle.getAttribute("data-index"))) ){
+                    end = parseInt(parentEle.getAttribute("data-index"));
+                }
+            }
+
+            childEle.ondrop = function(e){
+                e.preventDefault();
+                start = parseInt(e.dataTransfer.getData("start"));
+                
+                if(start != end){
+                    moveAfter(allTasks, start, end);
+                    
+                    resetTasksArray(allTasks, 0);
+                    displayTasks(tasksContainer, allTasks, true);
+
+                    tasksObject["allTasks"] = allTasks;
+                    saveToLocalStorage(tasksObject);
+                    backToAllTasksMenu();
+                }
+            }
+            
+            childEle.ondragenter = function(e){
+                this.classList.add("over");
+            }
+
+            childEle.ondragleave = function(e){
+                this.classList.remove("over");
+            }
+        })
+    })
+}
+
+function moveAfter(arr, from, to){
+    if(from<to){
+        arr.splice(to, 0, arr.splice(from, 1)[0]);
+    }else{
+        arr.splice(to+1, 0, arr.splice(from, 1)[0]);
+    }
+}
+
+function moveBefore(arr, from, to){
+    if(from<to){
+        arr.splice(to-1, 0, arr.splice(from, 1)[0]);
+    }else{
+        arr.splice(to, 0, arr.splice(from, 1)[0]);
+    }
 }

@@ -152,6 +152,30 @@ body.dark-mode .container .todolist #displayTasks #tasks .task{
     color: var(--text-color-dark);
 }
 
+.container .todolist #displayTasks #tasks .task .toDropBefore{
+    position: absolute;
+    top: -2.5px;
+    left: -1px;
+    right: -1px;
+    height: 5px;
+
+}
+
+.container .todolist #displayTasks #tasks .task .toDropAfter{
+    position: absolute;
+    bottom: -2.5px;
+    left: -1px;
+    right: -1px;
+    height: 5px;
+}
+
+
+.container .todolist #displayTasks #tasks .task .toDropBefore.over,
+.container .todolist #displayTasks #tasks .task .toDropAfter.over{
+    background: linear-gradient(130deg, hsl(192, 100%, 67%),  hsl(280, 87%, 65%));
+} 
+
+
 .container .todolist #displayTasks #tasks .task:not(:last-of-type){
     border-bottom: 1px solid rgba(218, 218, 218, 0.63);
 }
