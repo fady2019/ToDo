@@ -192,7 +192,7 @@ function displayTasks(parent, array, callChangingFunction){
         parent.innerHTML += element;
     });
 
-    toMakeTasksDraggableAndDroppable(parent);
+    toMakeTasksDraggableAndDroppable();
     
     if(callChangingFunction === true){
         toMakeTasksCheckable();
@@ -372,100 +372,106 @@ function toMakeTasksCheckable(){
     })
 }
 
-function toMakeTasksDraggableAndDroppable(parent){
-    parent.querySelectorAll(".task").forEach(parentEle => {
-        parentEle.setAttribute("draggable", "true");
+function toMakeTasksDraggableAndDroppable(){
+    tasksContainer.querySelectorAll(".task").forEach(task => {
+        task.setAttribute("draggable", "true");
+
+        let dataIndex = task.getAttribute("data-index"),
+            siblings = document.querySelectorAll(`#tasks>div:not([data-index = '${dataIndex}'])`),
+            allPrevSiblings,
+            allNextSiblings;
+
 
         let start, end;
-        parentEle.ondragstart = function(e){
-            e.dataTransfer.setData("start", e.target.getAttribute("data-index"));
-            e.dataTransfer.effectAllowed = "move";
+        task.ondragstart = function(e){
+            allPrevSiblings=[];
+            allNextSiblings=[];
+
+            let taskIndex = parseInt(e.target.getAttribute("data-index"));
+            e.dataTransfer.setData("start", taskIndex);
+
+            siblings.forEach(sib => {
+                let sibIndex = parseInt(sib.getAttribute("data-index"));
+
+                if(sibIndex<taskIndex){
+                    allPrevSiblings.push(sib);
+                }else if(sibIndex>taskIndex){
+                    allNextSiblings.push(sib);
+                }
+            })
+
+            if(allPrevSiblings.length > 0){
+                allPrevSiblings.forEach(prevTask => {
+                    let beforeBar = prevTask.querySelector(".toDropBefore");
+
+                    beforeBar.ondragover = function(e){
+                        e.preventDefault();
+
+                        if( !(end == parseInt(prevTask.getAttribute("data-index"))) ){
+                            end = parseInt(prevTask.getAttribute("data-index"));
+                        }
+                    }
+
+                    beforeBar.ondrop = function(e){
+                        e.preventDefault();
+                        start = parseInt(e.dataTransfer.getData("start"));
+
+                        if(start != end){
+                            move(allTasks, start, end);
+
+                
+                            resetTasksArray(allTasks, 0);
+                            displayTasks(tasksContainer, allTasks, true);
+
+                            tasksObject["allTasks"] = allTasks;
+                            saveToLocalStorage(tasksObject);
+                            backToAllTasksMenu();
+                        }
+                    }
+
+                    beforeBar.ondragenter = function(){ this.classList.add("over"); }
+
+                    beforeBar.ondragleave = function(){ this.classList.remove("over"); }
+                })
+            }
+
+            if(allNextSiblings.length > 0){
+                allNextSiblings.forEach(nextSib => {
+                    let afterBar = nextSib.querySelector(".toDropAfter");
+
+                    afterBar.ondragover = function(e){
+                        e.preventDefault();
+
+                        if( !(end == parseInt(nextSib.getAttribute("data-index"))) ){
+                            end = parseInt(nextSib.getAttribute("data-index"));
+                        }
+                    }
+        
+                    afterBar.ondrop = function(e){
+                        e.preventDefault();
+                        start = parseInt(e.dataTransfer.getData("start"));
+                        
+                        if(start != end){
+                            move(allTasks, start, end);
+                            
+                            resetTasksArray(allTasks, 0);
+                            displayTasks(tasksContainer, allTasks, true);
+        
+                            tasksObject["allTasks"] = allTasks;
+                            saveToLocalStorage(tasksObject);
+                            backToAllTasksMenu();
+                        }
+                    }
+                    
+                    afterBar.ondragenter = function(){ this.classList.add("over"); }
+        
+                    afterBar.ondragleave = function(){ this.classList.remove("over"); }
+                })
+            }
         }
-
-        parentEle.querySelectorAll(".toDropBefore").forEach(childEle => {
-            childEle.ondragover = function(e){
-                e.preventDefault();
-                e.dataTransfer.dropEffect = "move";
-                
-                if( !(end == parseInt(parentEle.getAttribute("data-index"))) ){
-                    end = parseInt(parentEle.getAttribute("data-index"));
-                }
-            }
-
-            childEle.ondrop = function(e){
-                e.preventDefault();
-                start = parseInt(e.dataTransfer.getData("start"));
-                
-                if(start != end){
-                    moveBefore(allTasks, start, end);
-                    
-                    resetTasksArray(allTasks, 0);
-                    displayTasks(tasksContainer, allTasks, true);
-
-                    tasksObject["allTasks"] = allTasks;
-                    saveToLocalStorage(tasksObject);
-                    backToAllTasksMenu();
-                }
-            }
-
-            childEle.ondragenter = function(e){
-                this.classList.add("over");
-            }
-
-            childEle.ondragleave = function(e){
-                this.classList.remove("over");
-            }
-        })
-
-        parentEle.querySelectorAll(".toDropAfter").forEach(childEle => {
-            childEle.ondragover = function(e){
-                e.preventDefault();
-                e.dataTransfer.dropEffect = "move";
-
-                if( !(end == parseInt(parentEle.getAttribute("data-index"))) ){
-                    end = parseInt(parentEle.getAttribute("data-index"));
-                }
-            }
-
-            childEle.ondrop = function(e){
-                e.preventDefault();
-                start = parseInt(e.dataTransfer.getData("start"));
-                
-                if(start != end){
-                    moveAfter(allTasks, start, end);
-                    
-                    resetTasksArray(allTasks, 0);
-                    displayTasks(tasksContainer, allTasks, true);
-
-                    tasksObject["allTasks"] = allTasks;
-                    saveToLocalStorage(tasksObject);
-                    backToAllTasksMenu();
-                }
-            }
-            
-            childEle.ondragenter = function(e){
-                this.classList.add("over");
-            }
-
-            childEle.ondragleave = function(e){
-                this.classList.remove("over");
-            }
-        })
     })
 }
 
-function moveAfter(arr, from, to){
-    if(from<to){
-        arr.splice(to, 0, arr.splice(from, 1)[0]);
-    }else{
-        arr.splice(to+1, 0, arr.splice(from, 1)[0]);
-    }
-}
-
-function moveBefore(arr, from, to){
-    if(from<to){
-        arr.splice(to-1, 0, arr.splice(from, 1)[0]);
-    }else{
-        arr.splice(to, 0, arr.splice(from, 1)[0]);
-    }
+function move(arr, from, to){
+    arr.splice(to, 0, arr.splice(from, 1)[0]);
 }
